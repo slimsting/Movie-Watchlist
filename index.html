@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <nav>
+      <h1>Find your film</h1>
+      <h3>Watchlist</h3>
+    </nav>
+    <main>
+      <form id="search-form">
+        <!-- <label for="search">Search for stuff</label> -->
+        <input
+          name="search"
+          id="search"
+          type="search"
+          placeholder="Search movie..."
+          autofocus
+          required
+        />
+        <button type="submit">Go</button>
+      </form>
+      <div class="movies-list-container" id="movies-list-container">
+        <div class="movie-container">
+          <img
+            alt="movie-poster"
+            class="movie-poster"
+            src="https://m.media-amazon.com/images/M/MV5BNzQzMzJhZTEtOWM4NS00MTdhLTg0YjgtMjM4MDRkZjUwZDBlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg"
+          />
+          <div class="movie-details">
+            <h2>Blade Runner ⭐ 8.1</h2>
+            <h3>117 min Action, Drama, Sci-fi.</h3>
+            <p>
+              A blade runner must pursue and terminate four replicants who stole
+              a ship in space, and have returned to Earth to find their creator.
+            </p>
+          </div>
+          <button id="add-to-watchlist">+</button>
+        </div>
+      </div>
+    </main>
+    <script src="index.js" type="module"></script>
+  </body>
+</html>

@@ -1,0 +1,130 @@
+:root {
+  --space-cadet: #2d3047ff;
+  --jungle-green: #419d78ff;
+  --earth-yellow: #e0a458ff;
+  --light-orange: #ffdbb5ff;
+  --steel-pink: #c04abcff;
+}
+* {
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  color: whitesmoke;
+  display: flex;
+  flex-direction: column;
+}
+
+h1 {
+  font-size: 2.5em;
+}
+
+nav {
+  display: flex;
+  padding: 0 3em;
+  justify-content: space-between;
+  height: 30vh;
+  background-color: #419d78ff;
+  align-items: center;
+}
+
+main {
+  width: 100vw;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
+form {
+  /* background-color: tan; */
+  width: 60vh;
+  margin: 0 auto;
+  height: 3em;
+  display: flex;
+  align-content: stretch;
+  transform: translate(0, -25px);
+}
+
+form > input {
+  width: 50vh;
+  padding: 0 2em;
+  border-radius: 1em 0 0em 1em;
+}
+form > button {
+  width: 10vh;
+  border-radius: 0 1em 1em 0;
+  background-color: #2d3047ff;
+  color: whitesmoke;
+}
+form > button:hover {
+  background-color: #c04abcff;
+}
+
+form > input,
+form > button {
+  outline: none;
+  font-weight: bold;
+  border: 1px solid #ffdbb5ff;
+  /* border: none; */
+}
+.movies-list-container {
+  padding: 0 2em;
+  display: flex;
+  flex-direction: column;
+}
+.movie-container {
+  border: 1px solid #419d78ff;
+  display: flex;
+  gap: 1em;
+  height: 200px;
+  background-color: #e0a458ff;
+  border-radius: 0.5em;
+  padding: 1em;
+  margin: 0.5em 0;
+  filter: drop-shadow(0.5em 0.5em 0.1em rgb(206, 210, 241));
+}
+.movie-poster {
+  height: 170px;
+  width: calc(170px * 2 / 3);
+  border-radius: 5px;
+  align-self: flex-start;
+}
+
+.movie-details {
+  display: flex;
+  flex-direction: column;
+  background-color: whitesmoke;
+  padding: 0.5em;
+  color: black;
+  border-radius: 5px;
+  width: 100%;
+  overflow: auto;
+}
+.movie-details > p {
+  /* background-color: red; */
+  margin-top: 0.5em;
+}
+#add-to-watchlist {
+  align-self: center;
+  border-radius: 50%;
+  outline: none;
+  border: none;
+  background-color: #2d3047ff;
+  font-weight: bold;
+  font-size: 18px;
+  text-align: center;
+  color: whitesmoke;
+  height: 2em;
+  width: 2em;
+}
+#add-to-watchlist:hover {
+  background-color: #c04abcff;
+}
+#no-results {
+  margin: 20vh auto;
+  width: 50vh;
+  text-align: center;
+  color: grey;
+}
