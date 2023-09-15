@@ -8,6 +8,8 @@ form.addEventListener("submit", async (e) => {
   const movie = formData.get("search");
   let html = "";
 
+  console.log(movie);
+
   const respose = await fetch(
     `http://www.omdbapi.com/?apikey=${APIkey}&s=${movie}`
   );
@@ -20,12 +22,12 @@ form.addEventListener("submit", async (e) => {
         `http://www.omdbapi.com/?apikey=${APIkey}&i=${movie.imdbID}`
       );
       const data = await response.json();
-      const poster = data.Poster;
-      const title = data.Title;
+      const poster = data.Poster || "";
+      const title = data.Title || "";
       const rating = data.Ratings[0].Value;
-      const runtime = data.Runtime;
-      const genre = data.Genre;
-      const plot = data.Plot;
+      const runtime = data.Runtime || "";
+      const genre = data.Genre || "";
+      const plot = data.Plot || "";
 
       html += `
         <div class="movie-container">
@@ -45,8 +47,10 @@ form.addEventListener("submit", async (e) => {
             </div>
         `;
     }
+    document.getElementById("search").value = "";
     document.getElementById("movies-list-container").innerHTML = html;
   } else {
+    document.getElementById("search").value = "";
     document.getElementById(
       "movies-list-container"
     ).innerHTML = `<h4 id="no-results">Unable to find what you are looking for. Please try another search</h4>`;
