@@ -74,7 +74,8 @@ form > button {
   border: 1px solid #ffdbb5ff;
   /* border: none; */
 }
-.movies-list-container {
+.movies-list-container,
+.movies-list-container2 {
   padding: 0 2em;
   display: flex;
   flex-direction: column;
@@ -84,13 +85,14 @@ form > button {
   display: flex;
   gap: 1em;
   height: 200px;
-  background-color: #e0a458ff;
+  background-color: whitesmoke;
   border-radius: 0.5em;
   padding: 1em;
   margin: 0.5em 0;
   filter: drop-shadow(0.5em 0.5em 0.1em rgb(206, 210, 241));
 }
 .movie-poster {
+  border: 1px solid #419d78ff;
   height: 170px;
   width: calc(170px * 2 / 3);
   border-radius: 5px;
@@ -111,21 +113,25 @@ form > button {
   /* background-color: red; */
   margin-top: 0.5em;
 }
-#add-to-watchlist {
+#add-to-watchlist,
+#remove-from-watchlist {
   align-self: center;
   border-radius: 50%;
   outline: none;
   border: none;
   background-color: #2d3047ff;
   font-weight: bold;
-  font-size: 18px;
+  font-size: 1em;
   text-align: center;
   color: whitesmoke;
-  height: 2em;
-  width: 2em;
+  height: 20px;
+  width: 20px;
+  cursor: pointer;
 }
-#add-to-watchlist:hover {
+#add-to-watchlist:hover,
+#remove-from-watchlist:hover {
   background-color: #c04abcff;
+  cursor: pointer;
 }
 #no-results {
   margin: 20vh auto;
