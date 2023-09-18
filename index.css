@@ -57,12 +57,12 @@ form {
 }
 
 form > input {
-  width: 50vh;
+  width: 80%;
   padding: 0 2em;
   border-radius: 1em 0 0em 1em;
 }
 form > button {
-  width: 10vh;
+  width: 20%;
   border-radius: 0 1em 1em 0;
   background-color: #2d3047ff;
   color: whitesmoke;
@@ -136,7 +136,7 @@ form > button {
 }
 #no-results {
   margin: 20vh auto;
-  width: 50vh;
+  width: 80%;
   text-align: center;
   color: grey;
 }
