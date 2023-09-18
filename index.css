@@ -16,6 +16,7 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
+  min-width: 500px;
 }
 
 h1 {
@@ -26,7 +27,7 @@ nav {
   display: flex;
   padding: 0 3em;
   justify-content: space-between;
-  height: 30vh;
+  height: 200px;
   background-color: #419d78ff;
   align-items: center;
   width: 100%;
@@ -47,13 +48,13 @@ main {
 
 form {
   /* background-color: tan; */
-  min-width: 500px;
+  min-width: 400px;
   width: 70%;
   margin: 0 auto;
   height: 3em;
   display: flex;
   align-content: stretch;
-  /* transform: translate(0, -25px); */
+  transform: translate(0, -25px);
 }
 
 form > input {
