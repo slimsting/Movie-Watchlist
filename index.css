@@ -28,6 +28,7 @@ nav {
   height: 30vh;
   background-color: #419d78ff;
   align-items: center;
+  width: 100%;
 }
 
 nav > a,
