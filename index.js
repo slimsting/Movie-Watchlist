@@ -89,8 +89,9 @@ const app = {
           if (movie.imdbID === imdbID) {
             selectedMovie = movie;
 
-            const retrievedData = localStorage.getItem("myWatchList");
-            app.myWatchListArray = JSON.parse(retrievedData);
+            app.myWatchListArray = JSON.parse(
+              localStorage.getItem("myWatchList")
+            );
 
             if (!app.myWatchListArray.includes(selectedMovie)) {
               app.myWatchListArray.push(selectedMovie);
@@ -110,8 +111,7 @@ const app = {
     });
   },
   watchList: (page) => {
-    const retrievedData = localStorage.getItem("myWatchList");
-    app.myWatchListArray = JSON.parse(retrievedData);
+    app.myWatchListArray = JSON.parse(localStorage.getItem("myWatchList"));
 
     if (app.myWatchListArray) {
       app.renderMovies(app.myWatchListArray, page);
