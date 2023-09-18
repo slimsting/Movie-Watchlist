@@ -111,10 +111,10 @@ form > button {
   color: black;
   border-radius: 5px;
   width: 100%;
-  overflow: auto;
+  /* overflow: auto; */
 }
 .movie-details > p {
-  /* background-color: red; */
+  overflow: auto;
   margin-top: 0.5em;
 }
 #movie-button {
