@@ -28,79 +28,81 @@ const app = {
         </div>`;
 
     const form = document.getElementById("search-form");
-    let movieArr = [];
+    let searchResultsArr = [];
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
+      // searchResultsArr = [];
       const formData = new FormData(form);
       const userInput = formData.get("user-input");
-      const searchUrl = `http://www.omdbapi.com/?apikey=${app.APIkey}&s=${userInput}`;
-      //   console.log(`searchUrl: ${searchUrl}`);
+      let resultsArr = [];
+      console.log(userInput);
+      // document.getElementById("user-input").value = "";
 
-      const response = await fetch(searchUrl);
-      const data = await response.json();
-      //   console.log(data);
+      //fetch movie list array using user input as search key
 
-      const movieList = data.Search;
+      const respose = await fetch(
+        `http://www.omdbapi.com/?apikey=${app.APIkey}&s=${userInput}`
+      );
+      const data = await respose.json();
 
-      if (movieList) {
-        for (let movie of movieList) {
-          try {
-            const imdbID = movie.imdbID;
-            const movieUrl = `http://www.omdbapi.com/?apikey=${app.APIkey}&i=${imdbID}`;
-            // console.log(`movieUrl: ${movieUrl}`);
+      const searchResults = data.Search;
 
-            const respose = await fetch(movieUrl);
-            const data = await respose.json();
-            // console.log(data);
-            const movieObj = {
-              imdbID: imdbID,
-              poster: data.Poster,
-              title: data.Title,
-              rating: data.Ratings[0].Value,
-              runtime: data.Runtime,
-              genre: data.Genre,
-              plot: data.Plot,
-            };
+      for (let movie of searchResults) {
+        // console.log(movie);
+        const imdbID = movie.imdbID;
+        const movieUrl = `http://www.omdbapi.com/?apikey=${app.APIkey}&i=${imdbID}`;
 
-            movieArr.push(movieObj);
-          } catch (err) {
-            console.log(`Error has occured: ${err}`);
-          }
+        try {
+          const response = await fetch(movieUrl);
+          const data = await response.json();
+
+          const movieObj = {
+            imdbID: data.imdbID,
+            poster: data.Poster,
+            title: data.Title,
+            rating: data.Ratings[0].Value,
+            runtime: data.Runtime,
+            genre: data.Genre,
+            plot: data.Plot,
+          };
+
+          resultsArr.push(movieObj);
+        } catch (err) {
+          console.log("Err occured" + err);
         }
-        console.log(movieArr);
-
-        app.renderMovies(movieArr, page);
-        document.getElementById("user-input").value = "";
-        // movieArr = [];
-      } else {
-        document.getElementById("movies-list-container").innerHTML = `
-        <div class="message-box">
-          <h2>Unable to find what you are looking for. Please try another search... </h2>
-        </div>`;
       }
 
-      //   console.log(movieList);
+      searchResultsArr = resultsArr;
+      app.renderMovies(searchResultsArr, page);
     });
 
     document.addEventListener("click", (e) => {
       const imdbID = e.target.dataset.movieid;
-      let selectedMovie = {};
-      console.log(imdbID);
 
-      for (let movie of movieArr) {
-        if (movie.imdbID === imdbID) {
-          selectedMovie = movie;
-          if (!app.myWatchListArray.includes(selectedMovie)) {
-            app.myWatchListArray.push(selectedMovie);
-          } else {
-            console.log("movie already in watchlist array");
+      if (imdbID) {
+        let selectedMovie = {};
+        console.log(imdbID);
+
+        for (let movie of searchResultsArr) {
+          if (movie.imdbID === imdbID) {
+            selectedMovie = movie;
+            if (!app.myWatchListArray.includes(selectedMovie)) {
+              app.myWatchListArray.push(selectedMovie);
+            } else {
+              console.log("movie already in watchlist array");
+            }
           }
         }
-      }
 
-      localStorage.setItem("myWatchList", JSON.stringify(app.myWatchListArray));
+        localStorage.setItem(
+          "myWatchList",
+          JSON.stringify(app.myWatchListArray)
+        );
+      } else {
+        // console.log("pop");
+      }
     });
   },
   watchList: (page) => {
@@ -145,7 +147,7 @@ const app = {
     }
   },
   renderMovies: (movieArr, page) => {
-    console.log(`YOOO${movieArr}`);
+    // console.log(`YOOO${movieArr}`);
     let html = "";
     let buttonValue = "";
 
