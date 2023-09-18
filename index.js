@@ -1,6 +1,7 @@
 const app = {
   APIkey: "183ac45c",
   myWatchListArray: [],
+  searchResultsArr: [],
   init: () => {
     document.addEventListener("DOMContentLoaded", app.start);
     console.log("htmly loaded");
@@ -28,7 +29,6 @@ const app = {
         </div>`;
 
     const form = document.getElementById("search-form");
-    let searchResultsArr = [];
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -74,8 +74,8 @@ const app = {
         }
       }
 
-      searchResultsArr = resultsArr;
-      app.renderMovies(searchResultsArr, page);
+      app.searchResultsArr = resultsArr;
+      app.renderMovies(app.searchResultsArr, page);
     });
 
     document.addEventListener("click", (e) => {
@@ -85,9 +85,13 @@ const app = {
         let selectedMovie = {};
         console.log(imdbID);
 
-        for (let movie of searchResultsArr) {
+        for (let movie of app.searchResultsArr) {
           if (movie.imdbID === imdbID) {
             selectedMovie = movie;
+
+            const retrievedData = localStorage.getItem("myWatchList");
+            app.myWatchListArray = JSON.parse(retrievedData);
+
             if (!app.myWatchListArray.includes(selectedMovie)) {
               app.myWatchListArray.push(selectedMovie);
             } else {
