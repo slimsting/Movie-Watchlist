@@ -53,7 +53,7 @@ form {
   height: 3em;
   display: flex;
   align-content: stretch;
-  transform: translate(0, -25px);
+  /* transform: translate(0, -25px); */
 }
 
 form > input {
