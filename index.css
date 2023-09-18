@@ -30,7 +30,8 @@ nav {
   align-items: center;
 }
 
-nav > a {
+nav > a,
+.movies-list-container > a {
   text-decoration: none;
   color: whitesmoke;
 }
@@ -74,8 +75,7 @@ form > button {
   border: 1px solid #ffdbb5ff;
   /* border: none; */
 }
-.movies-list-container,
-.movies-list-container2 {
+.movies-list-container {
   padding: 0 2em;
   display: flex;
   flex-direction: column;
@@ -113,23 +113,21 @@ form > button {
   /* background-color: red; */
   margin-top: 0.5em;
 }
-#add-to-watchlist,
-#remove-from-watchlist {
-  align-self: center;
-  border-radius: 50%;
-  outline: none;
-  border: none;
+#movie-button {
+  align-self: flex-end;
+  border-radius: 5px;
   background-color: #2d3047ff;
   font-weight: bold;
   font-size: 1em;
   text-align: center;
   color: whitesmoke;
-  height: 20px;
-  width: 20px;
   cursor: pointer;
+  padding: 0.1em 0.5em;
+  flex-grow: 0;
+  flex-shrink: 0;
 }
-#add-to-watchlist:hover,
-#remove-from-watchlist:hover {
+#movie-button:hover,
+.message-box > a > h3:hover {
   background-color: #c04abcff;
   cursor: pointer;
 }
@@ -138,4 +136,31 @@ form > button {
   width: 50vh;
   text-align: center;
   color: grey;
+}
+.message-box {
+  display: flex;
+  text-align: center;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10em;
+}
+
+.message-box > h2 {
+  color: #dfdddd;
+}
+
+.message-box > a {
+  text-decoration: none;
+}
+
+.message-box > a > h3 {
+  color: whitesmoke;
+  background-color: black;
+  padding: 0.2em 0.6em;
+  align-self: center;
+  margin: 1em;
+  border-radius: 5px;
+}
+.message-box > img {
+  margin: 1em;
 }

@@ -1,135 +1,187 @@
-const form = document.getElementById("search-form");
-let myMovies = [];
-const APIkey = "183ac45c";
+const app = {
+  APIkey: "183ac45c",
+  myWatchListArray: [],
+  init: () => {
+    document.addEventListener("DOMContentLoaded", app.start);
+    console.log("htmly loaded");
+  },
+  start: () => {
+    let page = document.body.id;
+    switch (page) {
+      case "index":
+        console.log("index page loaded...");
+        app.index(page);
+        break;
+      case "watchlist":
+        console.log("watchlist page loaded...");
+        app.watchList(page);
+        break;
+      default:
+        app.somethingElse;
+    }
+  },
+  index: (page) => {
+    document.getElementById("movies-list-container").innerHTML = `
+        <div class="message-box">
+            <img src="./images/Icon.png"> 
+          <h2>Start exploring  </h2>
+        </div>`;
 
-//listen for a search
-renderWatchlist();
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+    const form = document.getElementById("search-form");
+    let movieArr = [];
 
-  const formData = new FormData(form);
-  const keyWord = formData.get("search");
-  let html = "";
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-  //   console.log(movie);
+      const formData = new FormData(form);
+      const userInput = formData.get("user-input");
+      const searchUrl = `http://www.omdbapi.com/?apikey=${app.APIkey}&s=${userInput}`;
+      //   console.log(`searchUrl: ${searchUrl}`);
 
-  const respose = await fetch(
-    `http://www.omdbapi.com/?apikey=${APIkey}&s=${keyWord}`
-  );
-  const data = await respose.json();
-  const movieList = data.Search;
-
-  if (movieList) {
-    for (let movie of movieList) {
-      const response = await fetch(
-        `http://www.omdbapi.com/?apikey=${APIkey}&i=${movie.imdbID}`
-      );
+      const response = await fetch(searchUrl);
       const data = await response.json();
-      const poster = data.Poster;
-      const title = data.Title;
-      const rating = data.Ratings[0].Value;
-      const runtime = data.Runtime;
-      const genre = data.Genre;
-      const plot = data.Plot;
-      const imdbID = data.imdbID;
+      //   console.log(data);
+
+      const movieList = data.Search;
+
+      if (movieList) {
+        for (let movie of movieList) {
+          try {
+            const imdbID = movie.imdbID;
+            const movieUrl = `http://www.omdbapi.com/?apikey=${app.APIkey}&i=${imdbID}`;
+            // console.log(`movieUrl: ${movieUrl}`);
+
+            const respose = await fetch(movieUrl);
+            const data = await respose.json();
+            // console.log(data);
+            const movieObj = {
+              imdbID: imdbID,
+              poster: data.Poster,
+              title: data.Title,
+              rating: data.Ratings[0].Value,
+              runtime: data.Runtime,
+              genre: data.Genre,
+              plot: data.Plot,
+            };
+
+            movieArr.push(movieObj);
+          } catch (err) {
+            console.log(`Error has occured: ${err}`);
+          }
+        }
+        console.log(movieArr);
+
+        app.renderMovies(movieArr, page);
+        document.getElementById("user-input").value = "";
+        // movieArr = [];
+      } else {
+        document.getElementById("movies-list-container").innerHTML = `
+        <div class="message-box">
+          <h2>Unable to find what you are looking for. Please try another search... </h2>
+        </div>`;
+      }
+
+      //   console.log(movieList);
+    });
+
+    document.addEventListener("click", (e) => {
+      const imdbID = e.target.dataset.movieid;
+      let selectedMovie = {};
+      console.log(imdbID);
+
+      for (let movie of movieArr) {
+        if (movie.imdbID === imdbID) {
+          selectedMovie = movie;
+          if (!app.myWatchListArray.includes(selectedMovie)) {
+            app.myWatchListArray.push(selectedMovie);
+          } else {
+            console.log("movie already in watchlist array");
+          }
+        }
+      }
+
+      localStorage.setItem("myWatchList", JSON.stringify(app.myWatchListArray));
+    });
+  },
+  watchList: (page) => {
+    const retrievedData = localStorage.getItem("myWatchList");
+    app.myWatchListArray = JSON.parse(retrievedData);
+
+    if (app.myWatchListArray) {
+      app.renderMovies(app.myWatchListArray, page);
+      // console.log(app.myWatchListArray);
+
+      document.addEventListener("click", (e) => {
+        const imdbID = e.target.dataset.movieid;
+        console.log(imdbID);
+
+        for (let movie of app.myWatchListArray) {
+          let selectedMovie = {};
+          if (movie.imdbID === imdbID) {
+            selectedMovie = movie;
+            const index = app.myWatchListArray.indexOf(selectedMovie);
+
+            console.log(index);
+            if (index > -1) {
+              app.myWatchListArray.splice(index, 1);
+              app.myWatchListArray = localStorage.setItem(
+                "myWatchList",
+                JSON.stringify(app.myWatchListArray)
+              );
+            }
+          }
+        }
+
+        app.myWatchListArray = JSON.parse(localStorage.getItem("myWatchList"));
+        app.renderMovies(app.myWatchListArray, page);
+        console.log(app.myWatchListArray.length);
+      });
+    } else {
+      document.getElementById("movies-list-container").innerHTML = `
+      <div class="message-box">
+        <h2>Your watchlist is looking a little empty... </h2>
+        <a href="index.html"><h3>let's add some movies</h3></a>
+      </div>`;
+    }
+  },
+  renderMovies: (movieArr, page) => {
+    console.log(`YOOO${movieArr}`);
+    let html = "";
+    let buttonValue = "";
+
+    if (page === "index") {
+      buttonValue = "+ watchlist";
+    } else if (page === "watchlist") {
+      buttonValue = "- watchlist";
+    }
+
+    for (let movie of movieArr) {
+      const { imdbID, poster, title, rating, runtime, genre, plot } = movie;
 
       html += `
-        <div class="movie-container">
-              <img
-                alt=" ${title}movie-poster"
-                class="movie-poster"
-                src="${poster}"
-              />
-              <div class="movie-details">
-                <h2>${title} ⭐ ${rating}</h2>
-                <h3>${runtime} ${genre}.</h3>
-                <p>
-                 ${plot}
-                </p>
-              </div>
-              <span id="add-to-watchlist" data-imdbadd="${imdbID}">+</span>
-            </div>
-        `;
+                <div class="movie-container">
+                      <img
+                        alt=" ${title}movie-poster"
+                        class="movie-poster"
+                        src="${poster}"
+                      />
+                      <div class="movie-details">
+                        <h2>${title} ⭐ ${rating}</h2>
+                        <h3 style = "display: flex; gap: 5px;">
+                            ${runtime} ${genre}.  
+                            <span 
+                                id="movie-button" 
+                                data-movieid="${imdbID}"
+                            >${buttonValue}</span></h3>
+                        <p>
+                         ${plot}
+                        </p>
+                      </div>
+                    </div>
+                `;
     }
-    document.getElementById("search").value = "";
     document.getElementById("movies-list-container").innerHTML = html;
-  } else {
-    document.getElementById("search").value = "";
-    document.getElementById(
-      "movies-list-container"
-    ).innerHTML = `<h4 id="no-results">Unable to find what you are looking for. Please try another search</h4>`;
-  }
-});
-
-document.addEventListener("click", async (e) => {
-  console.log(e.target.dataset.imdbadd);
-  console.log(e.target.dataset.imdbremove);
-  if (e.target.dataset.imdbadd) {
-    const movieID = e.target.dataset.imdbadd;
-
-    // console.log(movieID);
-    if (myMovies.includes(movieID)) {
-      console.log("already iiiinnnnn");
-    } else {
-      myMovies.push(movieID);
-      let string = JSON.stringify(myMovies);
-      localStorage.setItem("MyMovieList", string);
-      renderWatchlist();
-    }
-  } else if (e.target.dataset.imdbremove) {
-    const movieID = e.target.dataset.imdbremove;
-    const index = movieID.indexOf(movieID);
-    if (index > -1) {
-      myMovies.splice(index, 1);
-    }
-    let string = JSON.stringify(myMovies);
-    localStorage.setItem("MyMovieList", string);
-    renderWatchlist();
-  }
-});
-
-async function renderWatchlist() {
-  let movieList = localStorage.getItem("MyMovieList");
-  const movieIDs = JSON.parse(movieList);
-  let html2 = "";
-
-  if (movieIDs) {
-    for (let movieID of movieIDs) {
-      const response = await fetch(
-        `http://www.omdbapi.com/?apikey=${APIkey}&i=${movieID}`
-      );
-      const data = await response.json();
-
-      const poster = data.Poster;
-      const title = data.Title;
-      const rating = data.Ratings[0].Value;
-      const runtime = data.Runtime;
-      const genre = data.Genre;
-      const plot = data.Plot;
-      const imdbID = data.imdbID;
-
-      html2 += `
-        <div class="movie-container">
-              <img
-                alt=" ${title}movie-poster"
-                class="movie-poster"
-                src="${poster}"
-              />
-              <div class="movie-details">
-                <h2>${title} ⭐ ${rating}</h2>
-                <h3>${runtime} ${genre}.</h3>
-                <p>
-                 ${plot}
-                </p>
-              </div>
-              <span id="remove-from-watchlist" data-imdbremove="${imdbID}">-</span>
-            </div>
-        `;
-    }
-    document.getElementById("movies-list-container2").innerHTML = html2;
-  } else {
-    document.getElementById(
-      "movies-list-container2"
-    ).innerHTML = `<h4 id="no-results">Your watchlist is looking a little empty...</h4>`;
-  }
-}
+    // console.log(page);
+  },
+};
+app.init();

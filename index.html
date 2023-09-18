@@ -13,7 +13,7 @@
     />
     <link rel="stylesheet" href="index.css" />
   </head>
-  <body>
+  <body id="index">
     <nav>
       <h1>Find your film</h1>
       <a href="watchlist.html"><h3>Watch-list</h3></a>
@@ -22,11 +22,11 @@
       <form id="search-form">
         <!-- <label for="search">Search for stuff</label> -->
         <input
-          name="search"
-          id="search"
+          name="user-input"
+          id="user-input"
           type="search"
           placeholder="Search movie..."
-          autofocus
+          autofocusFind
           required
         />
         <button type="submit">Go</button>
@@ -40,13 +40,15 @@
           />
           <div class="movie-details">
             <h2>Blade Runner ⭐ 8.1</h2>
-            <h3>117 min Action, Drama, Sci-fi.</h3>
+            <h3>
+              117 min Action, Drama, Sci-fi.
+              <span id="add-to-watchlist"> + Add to watchlist</span>
+            </h3>
             <p>
               A blade runner must pursue and terminate four replicants who stole
               a ship in space, and have returned to Earth to find their creator.
             </p>
           </div>
-          <span id="add-to-watchlist">+</span>
         </div> -->
       </div>
     </main>
