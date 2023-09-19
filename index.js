@@ -1,6 +1,5 @@
 const app = {
   APIkey: "183ac45c",
-  watchListArr: [],
   searchResultsArr: [],
   init: () => {
     // localStorage.clear();
@@ -23,6 +22,7 @@ const app = {
     }
   },
   index: (page) => {
+    // localStorage.clear();
     document.getElementById("movies-list-container").innerHTML = `
         <div class="message-box">
             <img src="./images/Icon.png"> 
@@ -151,35 +151,35 @@ const app = {
     }
   },
   watchList: (page) => {
-    app.myWatchListArray = JSON.parse(localStorage.getItem("myWatchList"));
-    console.log(app.myWatchListArray);
+    let movieList = JSON.parse(localStorage.getItem("movieList"));
+    console.log(movieList);
 
-    if (app.myWatchListArray) {
-      app.renderMovies(app.myWatchListArray, page);
+    if (movieList) {
+      app.renderMovies(movieList, page);
       // console.log(app.myWatchListArray);
 
       document.addEventListener("click", (e) => {
         const imdbID = e.target.dataset.movieid;
         console.log(imdbID);
 
-        for (let movie of app.myWatchListArray) {
+        for (let movie of movieList) {
           let selectedMovie = {};
           if (movie.imdbID === imdbID) {
             selectedMovie = movie;
-            const index = app.myWatchListArray.indexOf(selectedMovie);
+            const index = movieList.indexOf(selectedMovie);
 
             console.log(index);
             if (index > -1) {
-              app.myWatchListArray.splice(index, 1);
-              app.myWatchListArray = localStorage.setItem(
-                "myWatchList",
-                JSON.stringify(app.myWatchListArray)
+              movieList.splice(index, 1);
+              movieList = localStorage.setItem(
+                "movieList",
+                JSON.stringify(movieList)
               );
             }
           }
         }
 
-        app.myWatchListArray = JSON.parse(localStorage.getItem("myWatchList"));
+        app.myWatchListArray = JSON.parse(localStorage.getItem("movieList"));
         app.renderMovies(app.myWatchListArray, page);
         console.log(app.myWatchListArray.length);
       });
