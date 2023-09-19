@@ -1,8 +1,9 @@
 const app = {
   APIkey: "183ac45c",
-  myWatchListArray: [],
+  watchListArr: [],
   searchResultsArr: [],
   init: () => {
+    // localStorage.clear();
     document.addEventListener("DOMContentLoaded", app.start);
     console.log("htmly loaded");
   },
@@ -27,37 +28,43 @@ const app = {
             <img src="./images/Icon.png"> 
           <h2>Start exploring  </h2>
         </div>`;
-
     const form = document.getElementById("search-form");
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      // searchResultsArr = [];
       const formData = new FormData(form);
       const userInput = formData.get("user-input");
-      let resultsArr = [];
-      console.log(userInput);
-      // document.getElementById("user-input").value = "";
+      const movieSearchUrl = `http://www.omdbapi.com/?apikey=${app.APIkey}&s=${userInput}`;
+      let movieSearchResultsArray = [];
+      // console.log(userInput);
+
+      document.getElementById("user-input").value = "";
 
       //fetch movie list array using user input as search key
-
-      const respose = await fetch(
-        `http://www.omdbapi.com/?apikey=${app.APIkey}&s=${userInput}`
-      );
+      const respose = await fetch(movieSearchUrl);
       const data = await respose.json();
 
+      //store the array with the list of movies in the search result
       const searchResults = data.Search;
+      // console.log(searchResults);
 
       for (let movie of searchResults) {
+        //for every movie in the list of movies in the searchresult array
         // console.log(movie);
+
+        // store its imdbID id to help retreive its details from the API
         const imdbID = movie.imdbID;
+        // console.log(imdbID);
+
         const movieUrl = `http://www.omdbapi.com/?apikey=${app.APIkey}&i=${imdbID}`;
 
+        //catch errors due failed data retreival due to undefined values
         try {
           const response = await fetch(movieUrl);
           const data = await response.json();
 
+          // create an object to hold the required movie details
           const movieObj = {
             imdbID: data.imdbID,
             poster: data.Poster,
@@ -68,50 +75,90 @@ const app = {
             plot: data.Plot,
           };
 
-          resultsArr.push(movieObj);
+          // poulate the array to hold the movie results for rendering purposes
+          movieSearchResultsArray.push(movieObj);
         } catch (err) {
           console.log("Err occured" + err);
         }
       }
 
-      app.searchResultsArr = resultsArr;
+      // store the search results array in a global variable to make it accessible anywhere in the app
+      app.searchResultsArr = movieSearchResultsArray;
+
+      // call render function giving it the pagesearch array and page ID so it knows where to render
       app.renderMovies(app.searchResultsArr, page);
+
+      // after rendering  the movies to the dom, listen for clicks
+      app.listenForMovieSelection();
     });
-
+  },
+  listenForMovieSelection: () => {
+    // listen for clicks everywhere on the document
     document.addEventListener("click", (e) => {
-      const imdbID = e.target.dataset.movieid;
+      const dataSet = e.target.dataset;
 
-      if (imdbID) {
-        let selectedMovie = {};
-        console.log(imdbID);
+      // if the element contains a dataset, it mean it is a button holding a movieID on the dom
+      if (dataSet) {
+        const buttons = document.getElementsByClassName("movie-button");
 
-        for (let movie of app.searchResultsArr) {
-          if (movie.imdbID === imdbID) {
-            selectedMovie = movie;
+        // store the movieID of the movie the user has clicked to help retrieve
+        //it from the global array containing an array of the search results
+        const selectedMovieImdbID = e.target.dataset.movieid;
 
-            app.myWatchListArray = JSON.parse(
-              localStorage.getItem("myWatchList")
-            );
-
-            if (!app.myWatchListArray.includes(selectedMovie)) {
-              app.myWatchListArray.push(selectedMovie);
-            } else {
-              console.log("movie already in watchlist array");
-            }
+        //show that movie is added to watchlist in dom
+        for (let button of buttons) {
+          if (button.dataset.movieid === selectedMovieImdbID) {
+            button.textContent = "added";
+            button.style.backgroundColor = "green";
           }
         }
 
-        localStorage.setItem(
-          "myWatchList",
-          JSON.stringify(app.myWatchListArray)
-        );
+        // initalize an object to hold the selected movie
+        let selectedMovieObj = {};
+
+        //loop over the global search results array to find which movie was clicked
+        for (let movie of app.searchResultsArr) {
+          if (movie.imdbID === selectedMovieImdbID) {
+            // if the imdbID of the current movie is the same as the one returned
+            // from the datase, store it in the initialized object
+            selectedMovieObj = movie;
+            // console.log(selectedMovieObj);
+          }
+        }
+
+        // console.log(selectedMovieObj);
+
+        app.addMovieToWatchlist(selectedMovieObj);
       } else {
-        // console.log("pop");
+        console.log("element without movie id clicked");
       }
     });
   },
+  addMovieToWatchlist: (selectedMovie) => {
+    if (localStorage.getItem("movieList") == null) {
+      localStorage.setItem("movieList", "[]");
+    }
+
+    let watchList = JSON.parse(localStorage.getItem("movieList"));
+
+    for (let movie in watchList) {
+      if (movie === selectedMovie) {
+        console.log(movie);
+      }
+    }
+
+    // console.log("movie already in list");
+
+    // watchList.push(selectedMovie);
+    // console.log(watchList);
+
+    // localStorage.setItem("movieList", JSON.stringify(watchList));
+
+    // console.log()
+  },
   watchList: (page) => {
     app.myWatchListArray = JSON.parse(localStorage.getItem("myWatchList"));
+    console.log(app.myWatchListArray);
 
     if (app.myWatchListArray) {
       app.renderMovies(app.myWatchListArray, page);
@@ -177,6 +224,7 @@ const app = {
                             ${runtime} ${genre}.  
                             <span 
                                 id="movie-button" 
+                                class ="movie-button"
                                 data-movieid="${imdbID}"
                             >${buttonValue}</span></h3>
                         <p>
