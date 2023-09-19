@@ -141,20 +141,14 @@ const app = {
 
     let watchList = JSON.parse(localStorage.getItem("movieList"));
 
-    for (let movie in watchList) {
-      if (movie === selectedMovie) {
-        console.log(movie);
-      }
+    if (watchList.includes(selectedMovie)) {
+      //
+      console.log("movie already in list");
+    } else {
+      watchList.push(selectedMovie);
+      console.log(watchList);
+      localStorage.setItem("movieList", JSON.stringify(watchList));
     }
-
-    // console.log("movie already in list");
-
-    // watchList.push(selectedMovie);
-    // console.log(watchList);
-
-    // localStorage.setItem("movieList", JSON.stringify(watchList));
-
-    // console.log()
   },
   watchList: (page) => {
     app.myWatchListArray = JSON.parse(localStorage.getItem("myWatchList"));
