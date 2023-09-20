@@ -2,15 +2,14 @@ const app = {
   APIkey: "183ac45c",
   searchResultsArr: [],
   init: () => {
-    // localStorage.clear();
     document.addEventListener("DOMContentLoaded", app.start);
-    console.log("htmly loaded");
+    // console.log("htmly loaded");
   },
   start: () => {
     let page = document.body.id;
     switch (page) {
       case "index":
-        console.log("index page loaded...");
+        // console.log("index page loaded...");
         app.index(page);
         break;
       case "watchlist":
@@ -21,7 +20,7 @@ const app = {
         app.somethingElse;
     }
   },
-  index: (page) => {
+  index: (pageID) => {
     // localStorage.clear();
     document.getElementById("movies-list-container").innerHTML = `
         <div class="message-box">
@@ -35,8 +34,8 @@ const app = {
 
       const formData = new FormData(form);
       const userInput = formData.get("user-input");
+
       const movieSearchUrl = `http://www.omdbapi.com/?apikey=${app.APIkey}&s=${userInput}`;
-      let movieSearchResultsArray = [];
       // console.log(movieSearchUrl);
 
       document.getElementById("user-input").value = "";
@@ -49,50 +48,36 @@ const app = {
       const searchResults = data.Search;
       // console.log(searchResults);
 
-      for (let movie of searchResults) {
-        //for every movie in the list of movies in the searchresult array
-        // console.log(movie);
-
-        // store its imdbID id to help retreive its details from the API
-        const imdbID = movie.imdbID;
-        // console.log(imdbID);
-
-        const movieUrl = `http://www.omdbapi.com/?apikey=${app.APIkey}&i=${imdbID}`;
-        // console.log(movieUrl);
-
-        //catch errors due failed data retreival due to undefined values
-        try {
-          const response = await fetch(movieUrl);
-
-          if (respose.ok) {
+      let moviesArr = await Promise.all(
+        searchResults.map(async (movie) => {
+          // console.log(movie);
+          try {
+            const movieUrl = `http://www.omdbapi.com/?apikey=${app.APIkey}&i=${movie.imdbID}`;
+            console.log(movieUrl);
+            const response = await fetch(movieUrl);
             const data = await response.json();
 
-            // create an object to hold the required movie details
-            const movieObj = {
+            return {
               imdbID: data.imdbID,
               poster: data.Poster,
               title: data.Title,
-              rating: data.Ratings[0].Value,
+              rating: data.Ratings[0]?.Value, //
               runtime: data.Runtime,
               genre: data.Genre,
               plot: data.Plot,
+              // type: data.
             };
-            // poulate the array to hold the movie results for rendering purposes
-            movieSearchResultsArray.push(movieObj);
-          } else {
-            throw new Error("could not retreive results");
+          } catch (err) {
+            console.log("Error occured" + err);
           }
-        } catch (err) {
-          console.log("Err occured" + err);
-        } finally {
-          // store the search results array in a global variable to make it accessible anywhere in the app
-          app.searchResultsArr = movieSearchResultsArray;
-        }
-      }
-      console.log(app.searchResultsArr);
+        })
+      );
+
+      console.log(moviesArr);
+      app.searchResultsArr = moviesArr;
 
       // call render function giving it the pagesearch array and page ID so it knows where to render
-      app.renderMovies(app.searchResultsArr, page);
+      app.renderMovies(moviesArr, pageID);
 
       // after rendering  the movies to the dom, listen for clicks
       app.listenForMovieSelection();
@@ -109,6 +94,8 @@ const app = {
 
         // use the movie id of the selected movie to retrieve the movie object
         // from the global variable holding the search results array
+
+        //refactor to us some
         for (let movie of app.searchResultsArr) {
           if (movie.imdbID === movieID) {
             selectedMovieObj = movie;
@@ -132,26 +119,27 @@ const app = {
 
     let watchList = JSON.parse(localStorage.getItem("movieList"));
 
-    if (watchList.filter((e) => e.imdbID === selectedMovie.imdbID).length > 0) {
+    if (watchList.some((e) => e.imdbID === selectedMovie.imdbID)) {
       // show that the movie is already in the list
       console.log("movie already in list");
     } else {
       watchList.push(selectedMovie);
-      console.log(watchList);
+      // console.log(watchList);
       localStorage.setItem("movieList", JSON.stringify(watchList));
     }
   },
-  watchList: (page) => {
+  watchList: (pageID) => {
     let movieList = JSON.parse(localStorage.getItem("movieList"));
     // console.log(movieList);
-    if (movieList.length > 0) {
-      app.renderMovies(movieList, page);
+    if (movieList?.length > 0) {
+      app.renderMovies(movieList, pageID);
       // console.log(app.myWatchListArray);
 
       document.addEventListener("click", (e) => {
         const imdbID = e.target.id;
 
         if (imdbID) {
+          //recheck
           for (let movie of movieList) {
             let selectedMovie = {};
             if (movie.imdbID === imdbID) {
@@ -170,7 +158,7 @@ const app = {
           }
 
           movieList = JSON.parse(localStorage.getItem("movieList"));
-          app.renderMovies(movieList, page);
+          app.renderMovies(movieList, pageID);
           console.log(movieList.length);
         } else {
           // do nothing
@@ -185,20 +173,21 @@ const app = {
       </div>`;
     }
   },
-  renderMovies: (movieArr, page) => {
+  renderMovies: (movieArr, pageID) => {
     // console.log(`YOOO${movieArr}`);
     let html = "";
     let buttonValue = "";
 
-    if (page === "index") {
+    if (pageID === "index") {
       buttonValue = "+ watchlist";
-    } else if (page === "watchlist") {
+    } else if (pageID === "watchlist") {
       buttonValue = "- watchlist";
     }
 
     for (let movie of movieArr) {
       const { imdbID, poster, title, rating, runtime, genre, plot } = movie;
 
+      // create a different file for template strings
       html += `
                 <div class="movie-container">
                       <img
