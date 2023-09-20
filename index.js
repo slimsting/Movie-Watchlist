@@ -37,7 +37,7 @@ const app = {
       const userInput = formData.get("user-input");
       const movieSearchUrl = `http://www.omdbapi.com/?apikey=${app.APIkey}&s=${userInput}`;
       let movieSearchResultsArray = [];
-      // console.log(userInput);
+      // console.log(movieSearchUrl);
 
       document.getElementById("user-input").value = "";
 
@@ -58,32 +58,38 @@ const app = {
         // console.log(imdbID);
 
         const movieUrl = `http://www.omdbapi.com/?apikey=${app.APIkey}&i=${imdbID}`;
+        // console.log(movieUrl);
 
         //catch errors due failed data retreival due to undefined values
         try {
           const response = await fetch(movieUrl);
-          const data = await response.json();
 
-          // create an object to hold the required movie details
-          const movieObj = {
-            imdbID: data.imdbID,
-            poster: data.Poster,
-            title: data.Title,
-            rating: data.Ratings[0].Value,
-            runtime: data.Runtime,
-            genre: data.Genre,
-            plot: data.Plot,
-          };
+          if (respose.ok) {
+            const data = await response.json();
 
-          // poulate the array to hold the movie results for rendering purposes
-          movieSearchResultsArray.push(movieObj);
+            // create an object to hold the required movie details
+            const movieObj = {
+              imdbID: data.imdbID,
+              poster: data.Poster,
+              title: data.Title,
+              rating: data.Ratings[0].Value,
+              runtime: data.Runtime,
+              genre: data.Genre,
+              plot: data.Plot,
+            };
+            // poulate the array to hold the movie results for rendering purposes
+            movieSearchResultsArray.push(movieObj);
+          } else {
+            throw new Error("could not retreive results");
+          }
         } catch (err) {
           console.log("Err occured" + err);
+        } finally {
+          // store the search results array in a global variable to make it accessible anywhere in the app
+          app.searchResultsArr = movieSearchResultsArray;
         }
       }
-
-      // store the search results array in a global variable to make it accessible anywhere in the app
-      app.searchResultsArr = movieSearchResultsArray;
+      console.log(app.searchResultsArr);
 
       // call render function giving it the pagesearch array and page ID so it knows where to render
       app.renderMovies(app.searchResultsArr, page);
@@ -93,44 +99,29 @@ const app = {
     });
   },
   listenForMovieSelection: () => {
-    // listen for clicks everywhere on the document
+    // listen for clicks on a movie button
     document.addEventListener("click", (e) => {
-      const dataSet = e.target.dataset;
+      const movieID = e.target.id;
 
-      // if the element contains a dataset, it mean it is a button holding a movieID on the dom
-      if (dataSet) {
-        const buttons = document.getElementsByClassName("movie-button");
-
-        // store the movieID of the movie the user has clicked to help retrieve
-        //it from the global array containing an array of the search results
-        const selectedMovieImdbID = e.target.dataset.movieid;
-
-        //show that movie is added to watchlist in dom
-        for (let button of buttons) {
-          if (button.dataset.movieid === selectedMovieImdbID) {
-            button.textContent = "added";
-            button.style.backgroundColor = "green";
-          }
-        }
-
-        // initalize an object to hold the selected movie
+      if (movieID) {
+        const button = document.getElementById(movieID);
         let selectedMovieObj = {};
 
-        //loop over the global search results array to find which movie was clicked
+        // use the movie id of the selected movie to retrieve the movie object
+        // from the global variable holding the search results array
         for (let movie of app.searchResultsArr) {
-          if (movie.imdbID === selectedMovieImdbID) {
-            // if the imdbID of the current movie is the same as the one returned
-            // from the datase, store it in the initialized object
+          if (movie.imdbID === movieID) {
             selectedMovieObj = movie;
             // console.log(selectedMovieObj);
           }
         }
-
-        // console.log(selectedMovieObj);
-
         app.addMovieToWatchlist(selectedMovieObj);
+
+        // show in dom that the movie has been added
+        button.textContent = "added";
+        button.style.backgroundColor = "green";
       } else {
-        console.log("element without movie id clicked");
+        // do nothing
       }
     });
   },
@@ -141,8 +132,8 @@ const app = {
 
     let watchList = JSON.parse(localStorage.getItem("movieList"));
 
-    if (watchList.includes(selectedMovie)) {
-      //
+    if (watchList.filter((e) => e.imdbID === selectedMovie.imdbID).length > 0) {
+      // show that the movie is already in the list
       console.log("movie already in list");
     } else {
       watchList.push(selectedMovie);
@@ -152,36 +143,39 @@ const app = {
   },
   watchList: (page) => {
     let movieList = JSON.parse(localStorage.getItem("movieList"));
-    console.log(movieList);
-
-    if (movieList) {
+    // console.log(movieList);
+    if (movieList.length > 0) {
       app.renderMovies(movieList, page);
       // console.log(app.myWatchListArray);
 
       document.addEventListener("click", (e) => {
-        const imdbID = e.target.dataset.movieid;
-        console.log(imdbID);
+        const imdbID = e.target.id;
 
-        for (let movie of movieList) {
-          let selectedMovie = {};
-          if (movie.imdbID === imdbID) {
-            selectedMovie = movie;
-            const index = movieList.indexOf(selectedMovie);
+        if (imdbID) {
+          for (let movie of movieList) {
+            let selectedMovie = {};
+            if (movie.imdbID === imdbID) {
+              selectedMovie = movie;
+              const index = movieList.indexOf(selectedMovie);
 
-            console.log(index);
-            if (index > -1) {
-              movieList.splice(index, 1);
-              movieList = localStorage.setItem(
-                "movieList",
-                JSON.stringify(movieList)
-              );
+              console.log(index);
+              if (index > -1) {
+                movieList.splice(index, 1);
+                movieList = localStorage.setItem(
+                  "movieList",
+                  JSON.stringify(movieList)
+                );
+              }
             }
           }
-        }
 
-        app.myWatchListArray = JSON.parse(localStorage.getItem("movieList"));
-        app.renderMovies(app.myWatchListArray, page);
-        console.log(app.myWatchListArray.length);
+          movieList = JSON.parse(localStorage.getItem("movieList"));
+          app.renderMovies(movieList, page);
+          console.log(movieList.length);
+        } else {
+          // do nothing
+        }
+        console.log(imdbID);
       });
     } else {
       document.getElementById("movies-list-container").innerHTML = `
@@ -217,9 +211,8 @@ const app = {
                         <h3 style = "display: flex; gap: 5px;">
                             ${runtime} ${genre}.  
                             <span 
-                                id="movie-button" 
+                                id="${imdbID}" 
                                 class ="movie-button"
-                                data-movieid="${imdbID}"
                             >${buttonValue}</span></h3>
                         <p>
                          ${plot}

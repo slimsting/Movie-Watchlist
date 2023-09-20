@@ -33,8 +33,19 @@ nav {
   width: 100%;
 }
 
+nav h1 {
+  font-size: 3em;
+}
+
+nav h3 {
+  font-size: 1.5em;
+}
+nav h3:hover {
+  color: #c04abcff;
+}
+
 nav > a,
-.movies-list-container > a {
+div.movies-list-container > a {
   text-decoration: none;
   color: whitesmoke;
 }
@@ -46,7 +57,7 @@ main {
   flex-direction: column;
 }
 
-form {
+#search-form {
   /* background-color: tan; */
   min-width: 400px;
   width: 70%;
@@ -55,36 +66,47 @@ form {
   display: flex;
   align-content: stretch;
   transform: translate(0, -25px);
+  border: 1px solid #419d78ff;
+  border-radius: 1em;
 }
 
-form > input {
+#search-form > input {
   width: 80%;
   padding: 0 2em;
   border-radius: 1em 0 0em 1em;
 }
-form > button {
+
+#search-form > input:hover,
+#search-form > input:active {
+  background-color: #ffdbb5ff;
+}
+
+#search-form > button {
   width: 20%;
   border-radius: 0 1em 1em 0;
   background-color: #2d3047ff;
   color: whitesmoke;
+  font-size: 1em;
 }
-form > button:hover {
+
+#search-form > button:hover {
   background-color: #c04abcff;
 }
 
-form > input,
-form > button {
+#search-form > input,
+#search-form > button {
   outline: none;
   font-weight: bold;
-  border: 1px solid #ffdbb5ff;
-  /* border: none; */
+  border: none;
 }
-.movies-list-container {
+
+div.movies-list-container {
   padding: 0 2em;
   display: flex;
   flex-direction: column;
 }
-.movie-container {
+
+div.movie-container {
   border: 1px solid #419d78ff;
   display: flex;
   gap: 1em;
@@ -95,7 +117,8 @@ form > button {
   margin: 0.5em 0;
   filter: drop-shadow(0.5em 0.5em 0.1em rgb(206, 210, 241));
 }
-.movie-poster {
+
+img.movie-poster {
   border: 1px solid #419d78ff;
   height: 170px;
   width: calc(170px * 2 / 3);
@@ -103,7 +126,7 @@ form > button {
   align-self: flex-start;
 }
 
-.movie-details {
+div.movie-details {
   display: flex;
   flex-direction: column;
   background-color: whitesmoke;
@@ -113,11 +136,13 @@ form > button {
   width: 100%;
   /* overflow: auto; */
 }
-.movie-details > p {
+
+div.movie-details > p {
   overflow: auto;
   margin-top: 0.5em;
 }
-#movie-button {
+
+span.movie-button {
   align-self: flex-end;
   border-radius: 5px;
   background-color: #2d3047ff;
@@ -130,18 +155,21 @@ form > button {
   flex-grow: 0;
   flex-shrink: 0;
 }
-#movie-button:hover,
-.message-box > a > h3:hover {
+
+span.movie-button:hover,
+div.message-box > a > h3:hover {
   background-color: #c04abcff;
   cursor: pointer;
 }
+
 #no-results {
   margin: 20vh auto;
   width: 80%;
   text-align: center;
   color: grey;
 }
-.message-box {
+
+div.message-box {
   display: flex;
   text-align: center;
   flex-direction: column;
@@ -149,15 +177,15 @@ form > button {
   margin-top: 10em;
 }
 
-.message-box > h2 {
+div.message-box > h2 {
   color: #dfdddd;
 }
 
-.message-box > a {
+div.message-box > a {
   text-decoration: none;
 }
 
-.message-box > a > h3 {
+div.message-box > a > h3 {
   color: whitesmoke;
   background-color: black;
   padding: 0.2em 0.6em;
@@ -165,6 +193,7 @@ form > button {
   margin: 1em;
   border-radius: 5px;
 }
-.message-box > img {
+
+div.message-box > img {
   margin: 1em;
 }
