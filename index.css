@@ -65,7 +65,7 @@ main {
   height: 3em;
   display: flex;
   align-content: stretch;
-  transform: translate(0, -25px);
+  /* transform: translate(0, -25px); */
   border: 1px solid #419d78ff;
   border-radius: 1em;
 }
@@ -104,6 +104,8 @@ div.movies-list-container {
   padding: 0 2em;
   display: flex;
   flex-direction: column;
+  max-width: 800px;
+  align-self: center;
 }
 
 div.movie-container {
@@ -142,7 +144,9 @@ div.movie-details > p {
   margin-top: 0.5em;
 }
 
-span.movie-button {
+button.movie-button {
+  border: none;
+  outline: none;
   align-self: flex-end;
   border-radius: 5px;
   background-color: #2d3047ff;
@@ -156,7 +160,7 @@ span.movie-button {
   flex-shrink: 0;
 }
 
-span.movie-button:hover,
+button.movie-button:hover,
 div.message-box > a > h3:hover {
   background-color: #c04abcff;
   cursor: pointer;

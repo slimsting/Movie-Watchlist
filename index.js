@@ -6,81 +6,92 @@ const app = {
     // console.log("htmly loaded");
   },
   start: () => {
-    let page = document.body.id;
-    switch (page) {
+    let pageID = document.body.id;
+    switch (pageID) {
       case "index":
         // console.log("index page loaded...");
-        app.index(page);
+        app.index(pageID);
         break;
       case "watchlist":
         console.log("watchlist page loaded...");
-        app.watchList(page);
+        app.watchList(pageID);
         break;
       default:
         app.somethingElse;
     }
   },
   index: (pageID) => {
-    // localStorage.clear();
-    document.getElementById("movies-list-container").innerHTML = `
+    const searchForm = document.getElementById("search-form");
+    const moviesContainerEl = document.getElementById("movies-list-container");
+
+    moviesContainerEl.innerHTML = `
         <div class="message-box">
             <img src="./images/Icon.png"> 
-          <h2>Start exploring  </h2>
+          <h2>Start exploring</h2>
         </div>`;
-    const form = document.getElementById("search-form");
 
-    form.addEventListener("submit", async (e) => {
+    searchForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const formData = new FormData(form);
+      const formData = new FormData(searchForm);
       const userInput = formData.get("user-input");
 
-      const movieSearchUrl = `http://www.omdbapi.com/?apikey=${app.APIkey}&s=${userInput}`;
-      // console.log(movieSearchUrl);
+      console.log(userInput);
 
-      document.getElementById("user-input").value = "";
+      const movieSearchUrl = `http://www.omdbapi.com/?apikey=${app.APIkey}&s=${userInput}`;
+      console.log(movieSearchUrl);
 
       //fetch movie list array using user input as search key
       const respose = await fetch(movieSearchUrl);
       const data = await respose.json();
 
-      //store the array with the list of movies in the search result
-      const searchResults = data.Search;
-      // console.log(searchResults);
+      console.log(data.Response);
 
-      let moviesArr = await Promise.all(
-        searchResults.map(async (movie) => {
-          // console.log(movie);
-          try {
-            const movieUrl = `http://www.omdbapi.com/?apikey=${app.APIkey}&i=${movie.imdbID}`;
-            console.log(movieUrl);
-            const response = await fetch(movieUrl);
-            const data = await response.json();
+      if (data.Response === "True") {
+        //store the array with the list of movies in the search result
+        const searchResults = data.Search;
+        console.log(searchResults);
 
-            return {
-              imdbID: data.imdbID,
-              poster: data.Poster,
-              title: data.Title,
-              rating: data.Ratings[0]?.Value, //
-              runtime: data.Runtime,
-              genre: data.Genre,
-              plot: data.Plot,
-              // type: data.
-            };
-          } catch (err) {
-            console.log("Error occured" + err);
-          }
-        })
-      );
+        let moviesArr = await Promise.all(
+          searchResults.map(async (movie) => {
+            // console.log(movie);
+            try {
+              const movieUrl = `http://www.omdbapi.com/?apikey=${app.APIkey}&i=${movie.imdbID}`;
+              console.log(movieUrl);
+              const response = await fetch(movieUrl);
+              const data = await response.json();
 
-      console.log(moviesArr);
-      app.searchResultsArr = moviesArr;
+              return {
+                imdbID: data.imdbID,
+                poster: data.Poster,
+                title: data.Title,
+                rating: data.Ratings[0]?.Value, //
+                runtime: data.Runtime,
+                genre: data.Genre,
+                plot: data.Plot,
+                // type: data.
+              };
+            } catch (err) {
+              console.log("Error occured" + err);
+            }
+          })
+        );
+        searchForm.reset();
 
-      // call render function giving it the pagesearch array and page ID so it knows where to render
-      app.renderMovies(moviesArr, pageID);
+        console.log(moviesArr);
+        app.searchResultsArr = moviesArr;
 
-      // after rendering  the movies to the dom, listen for clicks
-      app.listenForMovieSelection();
+        // call render function giving it the pagesearch array and page ID so it knows where to render
+        app.renderMovies(moviesArr, pageID);
+
+        // after rendering  the movies to the dom, listen for clicks
+        app.listenForMovieSelection();
+      } else {
+        moviesContainerEl.innerHTML = `
+        <div class="message-box">
+          <h2>Unable to find what you’re looking for. Please try another search.</h2>
+        </div>`;
+      }
     });
   },
   listenForMovieSelection: () => {
@@ -107,6 +118,7 @@ const app = {
         // show in dom that the movie has been added
         button.textContent = "added";
         button.style.backgroundColor = "green";
+        button.disabled = true;
       } else {
         // do nothing
       }
@@ -130,8 +142,9 @@ const app = {
   },
   watchList: (pageID) => {
     let movieList = JSON.parse(localStorage.getItem("movieList"));
+
     // console.log(movieList);
-    if (movieList?.length > 0) {
+    if (movieList.length > 0) {
       app.renderMovies(movieList, pageID);
       // console.log(app.myWatchListArray);
 
@@ -139,31 +152,9 @@ const app = {
         const imdbID = e.target.id;
 
         if (imdbID) {
-          //recheck
-          for (let movie of movieList) {
-            let selectedMovie = {};
-            if (movie.imdbID === imdbID) {
-              selectedMovie = movie;
-              const index = movieList.indexOf(selectedMovie);
-
-              console.log(index);
-              if (index > -1) {
-                movieList.splice(index, 1);
-                movieList = localStorage.setItem(
-                  "movieList",
-                  JSON.stringify(movieList)
-                );
-              }
-            }
-          }
-
-          movieList = JSON.parse(localStorage.getItem("movieList"));
+          app.removeMovieFromWatchlist(imdbID, movieList);
           app.renderMovies(movieList, pageID);
-          console.log(movieList.length);
-        } else {
-          // do nothing
         }
-        console.log(imdbID);
       });
     } else {
       document.getElementById("movies-list-container").innerHTML = `
@@ -172,6 +163,15 @@ const app = {
         <a href="index.html"><h3>let's add some movies</h3></a>
       </div>`;
     }
+  },
+  removeMovieFromWatchlist: (imdbID, movieList) => {
+    const indexOfSelectedMovie = movieList.findIndex(
+      (movie) => movie.imdbID === imdbID
+    );
+    movieList.splice(indexOfSelectedMovie, 1);
+
+    movieList = localStorage.setItem("movieList", JSON.stringify(movieList));
+    console.log(movieList);
   },
   renderMovies: (movieArr, pageID) => {
     // console.log(`YOOO${movieArr}`);
@@ -199,10 +199,10 @@ const app = {
                         <h2>${title} ⭐ ${rating}</h2>
                         <h3 style = "display: flex; gap: 5px;">
                             ${runtime} ${genre}.  
-                            <span 
+                            <button 
                                 id="${imdbID}" 
                                 class ="movie-button"
-                            >${buttonValue}</span></h3>
+                            >${buttonValue}</button></h3>
                         <p>
                          ${plot}
                         </p>
