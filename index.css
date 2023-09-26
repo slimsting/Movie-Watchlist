@@ -144,7 +144,11 @@ div.movie-details > p {
   margin-top: 0.5em;
 }
 
-button.movie-button {
+h3 > span {
+  font-size: 12px;
+}
+
+span.movie-button {
   border: none;
   outline: none;
   align-self: flex-end;
@@ -160,7 +164,7 @@ button.movie-button {
   flex-shrink: 0;
 }
 
-button.movie-button:hover,
+span.movie-button:hover,
 div.message-box > a > h3:hover {
   background-color: #c04abcff;
   cursor: pointer;
