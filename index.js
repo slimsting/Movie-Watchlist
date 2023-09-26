@@ -97,30 +97,34 @@ const app = {
   listenForMovieSelection: () => {
     // listen for clicks on a movie button
     document.addEventListener("click", (e) => {
-      const movieID = e.target.id;
+      if (e.target.dataset.id) {
+        const movieID = e.target.dataset.id;
 
-      if (movieID) {
-        const button = document.getElementById(movieID);
-        let selectedMovieObj = {};
+        if (movieID) {
+          const movieActionBtn = document.getElementById(movieID);
+          let selectedMovieObj = {};
 
-        // use the movie id of the selected movie to retrieve the movie object
-        // from the global variable holding the search results array
+          // use the movie id of the selected movie to retrieve the movie object
+          // from the global variable holding the search results array
 
-        //refactor to us some
-        for (let movie of app.searchResultsArr) {
-          if (movie.imdbID === movieID) {
-            selectedMovieObj = movie;
-            // console.log(selectedMovieObj);
+          //refactor to us some
+          for (let movie of app.searchResultsArr) {
+            if (movie.imdbID === movieID) {
+              selectedMovieObj = movie;
+              // console.log(selectedMovieObj);
+            }
           }
-        }
-        app.addMovieToWatchlist(selectedMovieObj);
+          app.addMovieToWatchlist(selectedMovieObj);
 
-        // show in dom that the movie has been added
-        button.textContent = "added";
-        button.style.backgroundColor = "green";
-        button.disabled = true;
-      } else {
-        // do nothing
+          console.log(movieID)
+
+          // show in dom that the movie has been added
+          movieActionBtn.textContent = "added";
+          movieActionBtn.style.backgroundColor = "green";
+          movieActionBtn.disabled = true;
+        } else {
+          // do nothing
+        }
       }
     });
   },
@@ -196,13 +200,16 @@ const app = {
                         src="${poster}"
                       />
                       <div class="movie-details">
-                        <h2>${title} ⭐ ${rating}</h2>
-                        <h3 style = "display: flex; gap: 5px;">
-                            ${runtime} ${genre}.  
-                            <button 
-                                id="${imdbID}" 
-                                class ="movie-button"
-                            >${buttonValue}</button></h3>
+                        <h3>${title} <span>⭐ ${rating}</span></h3>
+                        <div style ="display: flex; gap: 5px;">
+                          <span>${runtime}</span>
+                          <span>${genre}</span>  
+                          <span 
+                            id="${imdbID}"
+                            data-id="${imdbID}" 
+                            class ="movie-button">${buttonValue}
+                          </span>
+                        </div>
                         <p>
                          ${plot}
                         </p>
